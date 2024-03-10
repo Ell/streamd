@@ -15,6 +15,8 @@ const (
 )
 
 func connectToSocket(host string, out chan Message, cancel chan bool, status chan uint) {
+	sockErrCh := make(chan error)
+
 	status <- SocketConnecting
 
 	ws, err := websocket.Dial(host, "", "http://localhost/")
@@ -24,7 +26,7 @@ func connectToSocket(host string, out chan Message, cancel chan bool, status cha
 
 	status <- SocketConnected
 
-	defer func(ws *websocket.Conn) {
+	defer func() {
 		status <- SocketDisconnecting
 
 		err := ws.Close()
@@ -33,7 +35,22 @@ func connectToSocket(host string, out chan Message, cancel chan bool, status cha
 		}
 
 		status <- SocketDisconnected
-	}(ws)
+	}()
+
+	go func() {
+		for {
+			var message Message
+			err = websocket.JSON.Receive(ws, &message)
+
+			if err != nil {
+				fmt.Printf("Unable to receive websocket message %s\n", err)
+				sockErrCh <- err
+				return
+			}
+
+			out <- message
+		}
+	}()
 
 	for {
 		select {
@@ -41,18 +58,11 @@ func connectToSocket(host string, out chan Message, cancel chan bool, status cha
 			fmt.Println("Closing socket connection")
 			status <- SocketClosing
 			return
-		default:
-			var message Message
-
-			err = websocket.JSON.Receive(ws, &message)
-			if err != nil {
-				fmt.Printf("Unable to receive websocket message %s\n", err)
-
+		case socketErr := <-sockErrCh:
+			{
+				fmt.Printf("Got socket error %s", socketErr)
 				status <- SocketClosing
-
 				return
-			} else {
-				out <- message
 			}
 		}
 	}

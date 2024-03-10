@@ -23,7 +23,7 @@ func NewTestClient(socketAddress string) Client {
 }
 
 func (c *Client) Listen(events chan Message, clientStatus chan uint) {
-	var keepAlive = 10
+	var keepAlive = 30
 
 	var statusCh = make(chan uint)
 	var cancelCh = make(chan bool)
@@ -35,22 +35,13 @@ func (c *Client) Listen(events chan Message, clientStatus chan uint) {
 
 	for {
 		select {
-		case <-timer.C:
-			{
-				log.Println("Socket timed out, disconnecting")
-				cancelCh <- true
-			}
 		case status := <-statusCh:
 			{
 				if status == SocketDisconnected {
 					clientStatus <- ClientDisconnected
-
 					log.Println("Socket disconnected, reconnecting in 5 seconds...")
-
 					time.Sleep(time.Second * 5)
-
 					log.Println("Reconnecting to twitch eventsub")
-
 					go connectToSocket(c.socketAddress, msgCh, cancelCh, statusCh)
 				}
 
@@ -62,7 +53,7 @@ func (c *Client) Listen(events chan Message, clientStatus chan uint) {
 			{
 				events <- message
 
-				// timer.Reset(time.Duration(keepAlive) * time.Second)
+				timer.Reset(time.Duration(keepAlive) * time.Second)
 
 				if message.Metadata.MessageType == "session_welcome" {
 					var payload = new(SessionPayload)
@@ -78,6 +69,11 @@ func (c *Client) Listen(events chan Message, clientStatus chan uint) {
 				if message.Metadata.MessageType == "session_reconnect" {
 					cancelCh <- true
 				}
+			}
+		case <-timer.C:
+			{
+				log.Println("Socket timed out, disconnecting")
+				cancelCh <- true
 			}
 		}
 	}
