@@ -31,33 +31,6 @@ func NewTestClient(clientId, accessToken, baseUrl string) (*Client, error) {
 	return client, nil
 }
 
-// SendChatMessage Sends a message to the broadcaster’s chat room.
-func (c *Client) SendChatMessage(req SendChatMessageRequest) (SendChatMessageResponse, error) {
-	apiUrl := c.baseUrl + "/chat/messages"
-	resp, err := makeHelixPostRequest[SendChatMessageRequest, SendChatMessageResponse](c, apiUrl, req)
-
-	if err != nil {
-		fmt.Printf("Error making SendChatMessage request %s", err)
-		return SendChatMessageResponse{}, err
-	}
-
-	return resp.Data[0], nil
-}
-
-// GetCurrentUser Gets information about one or more users. Only fetches user associated with current client id
-func (c *Client) GetCurrentUser() (GetUsersResponse, error) {
-	var req struct{}
-
-	apiUrl := c.baseUrl + "/users"
-
-	resp, err := makeHelixGetRequest[interface{}, GetUsersResponse](c, apiUrl, req)
-	if err != nil {
-		fmt.Printf("Error making GetCurrentUser request %s", err)
-	}
-
-	return resp.Data[0], nil
-}
-
 func makeHelixGetRequest[T, U interface{}](client *Client, url string, data T) (APIResponse[U], error) {
 	var respData APIResponse[U]
 

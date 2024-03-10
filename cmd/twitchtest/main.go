@@ -36,6 +36,21 @@ func main() {
 		case event := <-eventsCh:
 			{
 				fmt.Printf("Got Event: %v\n", event)
+				if event.Metadata.MessageType == "session_welcome" {
+					var payload = new(eventsub.SessionPayload)
+
+					err = eventsub.UnmarshalMessagePayload(&event, &payload)
+					if err != nil {
+						log.Fatalf("Unable to unmarshal event payload %s", err)
+					}
+
+					sessionId := payload.Session.Id
+
+					err = client.SubscribeToChannelChatMessageEvent(user.Id, sessionId)
+					if err != nil {
+						log.Fatalf("Unable to subscribe to event %s", err)
+					}
+				}
 			}
 		case status := <-statusCh:
 			{

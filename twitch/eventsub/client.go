@@ -1,7 +1,6 @@
 package eventsub
 
 import (
-	"fmt"
 	"log"
 	"time"
 )
@@ -13,46 +12,33 @@ const (
 
 type Client struct {
 	socketAddress string
-	cancelCh      chan bool
-	msgCh         chan Message
 }
 
 func NewClient() Client {
-	cancelCh := make(chan bool)
-	msgCh := make(chan Message)
-
-	return Client{
-		"wss://eventsub.wss.twitch.tv/ws?keepalive_timeout_seconds=30",
-		cancelCh,
-		msgCh,
-	}
+	return Client{"wss://eventsub.wss.twitch.tv/ws?keepalive_timeout_seconds=30"}
 }
 
 func NewTestClient(socketAddress string) Client {
-	cancelCh := make(chan bool)
-	msgCh := make(chan Message)
-
-	return Client{
-		socketAddress,
-		cancelCh,
-		msgCh,
-	}
+	return Client{socketAddress}
 }
 
 func (c *Client) Listen(events chan Message, clientStatus chan uint) {
+	var keepAlive = 10
+
 	var statusCh = make(chan uint)
-	var keepAlive uint = 30
+	var cancelCh = make(chan bool)
+	var msgCh = make(chan Message)
 
-	timeout := time.After(time.Second * time.Duration(keepAlive))
+	timer := time.NewTimer(time.Second * time.Duration(keepAlive))
 
-	go ConnectToSocket(c.socketAddress, c.msgCh, c.cancelCh, statusCh)
+	go connectToSocket(c.socketAddress, msgCh, cancelCh, statusCh)
 
 	for {
 		select {
-		case <-timeout:
+		case <-timer.C:
 			{
 				log.Println("Socket timed out, disconnecting")
-				c.cancelCh <- true
+				cancelCh <- true
 			}
 		case status := <-statusCh:
 			{
@@ -65,40 +51,34 @@ func (c *Client) Listen(events chan Message, clientStatus chan uint) {
 
 					log.Println("Reconnecting to twitch eventsub")
 
-					go ConnectToSocket(c.socketAddress, c.msgCh, c.cancelCh, statusCh)
+					go connectToSocket(c.socketAddress, msgCh, cancelCh, statusCh)
 				}
 
 				if status == SocketConnected {
 					clientStatus <- ClientConnected
 				}
 			}
-		case message := <-c.msgCh:
+		case message := <-msgCh:
 			{
-				// events <- message
+				events <- message
+
+				// timer.Reset(time.Duration(keepAlive) * time.Second)
 
 				if message.Metadata.MessageType == "session_welcome" {
-					var session = message.Payload.(SessionPayload)
-					fmt.Printf("session %+v", session)
+					var payload = new(SessionPayload)
 
-					//keepAlive = session.KeepaliveTimeoutSeconds
-					//timeout = time.After(time.Duration(keepAlive) * time.Second)
+					err := UnmarshalMessagePayload(&message, payload)
+					if err != nil {
+						log.Fatalf("Could not unmarshal payload %s", err)
+					}
 
-					//out, _ := json.MarshalIndent(session, "", "\t")
-					//fmt.Println(string(out))
-				}
-
-				if message.Metadata.MessageType == "session_keepalive" {
-					timeout = time.After(time.Duration(keepAlive) * time.Second)
+					keepAlive = payload.Session.KeepaliveTimeoutSeconds
 				}
 
 				if message.Metadata.MessageType == "session_reconnect" {
-					c.cancelCh <- true
+					cancelCh <- true
 				}
 			}
 		}
 	}
-}
-
-func (c *Client) Disconnect() {
-	c.cancelCh <- true
 }

@@ -1,5 +1,7 @@
 package helix
 
+import "fmt"
+
 type APIResponse[T interface{}] struct {
 	Data       []T `json:"data"`
 	Pagination struct {
@@ -8,6 +10,11 @@ type APIResponse[T interface{}] struct {
 	Total        uint `json:"total,omitempty"`
 	TotalCost    uint `json:"total_cost,omitempty"`
 	MaxTotalCost uint `json:"max_total_cost,omitempty"`
+}
+
+type Transport struct {
+	Method    string `json:"method"`
+	SessionId string `json:"session_id,omitempty"`
 }
 
 type StartCommercialRequest struct {
@@ -21,28 +28,22 @@ type StartCommercialResponse struct {
 	RetryAfter       uint   `json:"retry_after"`
 }
 
-type CreateEventSubSubscription[C interface{}] struct {
-	SubscriptionType string `json:"type"`
-	Version          string `json:"version"`
-	Condition        C      `json:"condition"`
-	Transport        struct {
-		Method   string `json:"method,omitempty"`
-		Callback string `json:"callback,omitempty"`
-		Secret   string `json:"secret,omitempty"`
-	} `json:"transport"`
+type CreateEventSubSubscriptionRequest struct {
+	SubscriptionType string      `json:"type"`
+	Version          string      `json:"version"`
+	Condition        interface{} `json:"condition"`
+	Transport        Transport   `json:"transport"`
 }
 
 type CreateEventSubSubscriptionResponse struct {
-	Id               string `json:"id"`
-	Status           string `json:"status"`
-	SubscriptionType string `json:"type"`
-	Version          string `json:"version"`
-	Cost             uint   `json:"cost"`
-	Condition        struct {
-		UserId string `json:"user_id"`
-	} `json:"condition"`
-	CreatedAt string    `json:"created_at"`
-	Transport Transport `json:"transport"`
+	Id               string      `json:"id"`
+	Status           string      `json:"status"`
+	SubscriptionType string      `json:"type"`
+	Version          string      `json:"version"`
+	Cost             uint        `json:"cost"`
+	Condition        interface{} `json:"condition"`
+	CreatedAt        string      `json:"created_at"`
+	Transport        Transport   `json:"transport"`
 }
 
 type SendChatMessageRequest struct {
@@ -59,6 +60,19 @@ type SendChatMessageResponse struct {
 		Code    string `json:"code"`
 		Message string `json:"message"`
 	}
+}
+
+// SendChatMessage Sends a message to the broadcaster’s chat room.
+func (c *Client) SendChatMessage(req SendChatMessageRequest) (SendChatMessageResponse, error) {
+	apiUrl := c.baseUrl + "/chat/messages"
+	resp, err := makeHelixPostRequest[SendChatMessageRequest, SendChatMessageResponse](c, apiUrl, req)
+
+	if err != nil {
+		fmt.Printf("Error making SendChatMessage request %s", err)
+		return SendChatMessageResponse{}, err
+	}
+
+	return resp.Data[0], nil
 }
 
 type GetUsersRequest struct {
@@ -78,4 +92,18 @@ type GetUsersResponse struct {
 	ViewCount       uint   `json:"view_count"`
 	Email           string `json:"email"`
 	CreatedAt       string `json:"created_at"`
+}
+
+// GetCurrentUser Gets information about one or more users. Only fetches user associated with current client id
+func (c *Client) GetCurrentUser() (GetUsersResponse, error) {
+	var req struct{}
+
+	apiUrl := c.baseUrl + "/users"
+
+	resp, err := makeHelixGetRequest[interface{}, GetUsersResponse](c, apiUrl, req)
+	if err != nil {
+		fmt.Printf("Error making GetCurrentUser request %s", err)
+	}
+
+	return resp.Data[0], nil
 }
