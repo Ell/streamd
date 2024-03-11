@@ -1,10 +1,10 @@
 package helix
 
 import (
-	"fmt"
+	"log"
 )
 
-func (c *Client) subscribeToEvent(eventType, version string, condition interface{}, sessionId string) error {
+func (c *Client) SubscribeToEvent(eventType, version string, condition interface{}, sessionId string) error {
 	req := CreateEventSubSubscriptionRequest{
 		SubscriptionType: eventType,
 		Version:          version,
@@ -23,21 +23,8 @@ func (c *Client) subscribeToEvent(eventType, version string, condition interface
 	](c, apiUrl, req)
 
 	if err != nil {
-		fmt.Printf("Error making SubscribeToEvent request %s", err)
+		log.Printf("Error making SubscribeToEvent request %s", err)
 	}
 
 	return nil
-}
-
-func (c *Client) SubscribeToChannelChatMessageEvent(userId, sessionId string) error {
-	eventType := "channel.chat.message"
-	version := "1"
-	condition := ChannelChatMessageCondition{
-		BroadcasterUserId: userId,
-		UserId:            userId,
-	}
-
-	err := c.subscribeToEvent(eventType, version, condition, sessionId)
-
-	return err
 }

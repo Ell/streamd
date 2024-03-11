@@ -22,38 +22,30 @@ func NewTestClient(socketAddress string) Client {
 	return Client{socketAddress}
 }
 
-func (c *Client) Listen(events chan Message, clientStatus chan uint) {
-	var keepAlive = 30
+func (c *Client) Listen(events chan Message) {
+	keepAlive := time.Second * 30
+	timer := time.NewTimer(keepAlive)
 
-	var statusCh = make(chan uint)
-	var cancelCh = make(chan bool)
-	var msgCh = make(chan Message)
+	socketFinishedCh := make(chan bool)
+	cancelCh := make(chan bool)
+	msgCh := make(chan Message)
 
-	timer := time.NewTimer(time.Second * time.Duration(keepAlive))
-
-	go connectToSocket(c.socketAddress, msgCh, cancelCh, statusCh)
+	go connectToSocket(c.socketAddress, msgCh, cancelCh, socketFinishedCh)
 
 	for {
 		select {
-		case status := <-statusCh:
+		case <-socketFinishedCh:
 			{
-				if status == SocketDisconnected {
-					clientStatus <- ClientDisconnected
-					log.Println("Socket disconnected, reconnecting in 5 seconds...")
-					time.Sleep(time.Second * 5)
-					log.Println("Reconnecting to twitch eventsub")
-					go connectToSocket(c.socketAddress, msgCh, cancelCh, statusCh)
-				}
-
-				if status == SocketConnected {
-					clientStatus <- ClientConnected
-				}
+				log.Println("Socket disconnected, reconnecting in 5 seconds...")
+				time.Sleep(time.Second * 5)
+				log.Println("Reconnecting to twitch eventsub")
+				go connectToSocket(c.socketAddress, msgCh, cancelCh, socketFinishedCh)
 			}
 		case message := <-msgCh:
 			{
 				events <- message
 
-				timer.Reset(time.Duration(keepAlive) * time.Second)
+				timer.Reset(keepAlive)
 
 				if message.Metadata.MessageType == "session_welcome" {
 					var payload = new(SessionPayload)
@@ -63,7 +55,7 @@ func (c *Client) Listen(events chan Message, clientStatus chan uint) {
 						log.Fatalf("Could not unmarshal payload %s", err)
 					}
 
-					keepAlive = payload.Session.KeepaliveTimeoutSeconds
+					keepAlive = time.Second * time.Duration(payload.Session.KeepaliveTimeoutSeconds+10)
 				}
 
 				if message.Metadata.MessageType == "session_reconnect" {

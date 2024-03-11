@@ -1,49 +1,41 @@
 package eventsub
 
 import (
-	"fmt"
-	"golang.org/x/net/websocket"
+	"encoding/json"
+	"github.com/gorilla/websocket"
 	"log"
 )
 
-const (
-	SocketConnecting = iota
-	SocketConnected
-	SocketClosing
-	SocketDisconnecting
-	SocketDisconnected
-)
-
-func connectToSocket(host string, out chan Message, cancel chan bool, status chan uint) {
+func connectToSocket(host string, out chan Message, cancel chan bool, finished chan bool) {
 	sockErrCh := make(chan error)
 
-	status <- SocketConnecting
-
-	ws, err := websocket.Dial(host, "", "http://localhost/")
+	ws, _, err := websocket.DefaultDialer.Dial(host, nil)
 	if err != nil {
 		log.Fatalf("Could not create socket %s", err)
 	}
 
-	status <- SocketConnected
-
 	defer func() {
-		status <- SocketDisconnecting
-
 		err := ws.Close()
 		if err != nil {
 			log.Fatalf("Unable to close socket %s", err)
 		}
-
-		status <- SocketDisconnected
+		finished <- true
 	}()
 
 	go func() {
 		for {
 			var message Message
-			err = websocket.JSON.Receive(ws, &message)
 
+			_, b, err := ws.ReadMessage()
 			if err != nil {
-				fmt.Printf("Unable to receive websocket message %s\n", err)
+				log.Printf("Unable to receive websocket message %s\n", err)
+				sockErrCh <- err
+				return
+			}
+
+			err = json.Unmarshal(b, &message)
+			if err != nil {
+				log.Printf("Unable to unmarshal websocket message %s\n", err)
 				sockErrCh <- err
 				return
 			}
@@ -55,13 +47,13 @@ func connectToSocket(host string, out chan Message, cancel chan bool, status cha
 	for {
 		select {
 		case <-cancel:
-			fmt.Println("Closing socket connection")
-			status <- SocketClosing
-			return
+			{
+				log.Println("Closing socket connection")
+				return
+			}
 		case socketErr := <-sockErrCh:
 			{
-				fmt.Printf("Got socket error %s", socketErr)
-				status <- SocketClosing
+				log.Printf("Got socket error %s", socketErr)
 				return
 			}
 		}

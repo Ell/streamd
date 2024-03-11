@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package twitch.v1;
+
+option go_package = "github.com/ell/streamd/rpc/twitch/v1;twitchv1";
+
+import "twitch/v1/common.proto";
+
+message GetCurrentUserInfoRequest {}
+message GetCurrentUserInfoResponse {
+  TwitchUser user = 1;
+}
+
+service TwitchService {
+  rpc GetCurrentUserInfo(GetCurrentUserInfoRequest) returns (GetCurrentUserInfoResponse) {}
+}
