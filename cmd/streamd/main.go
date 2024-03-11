@@ -33,6 +33,8 @@ func main() {
 
 	for {
 		event := <-events
-		log.Printf("Got event %+v\n", event)
+
+		eventName := event.Metadata.MessageType
+		log.Printf("Got event %s\n", eventName)
 	}
 }

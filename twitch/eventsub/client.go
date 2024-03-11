@@ -22,7 +22,7 @@ func NewTestClient(socketAddress string) Client {
 	return Client{socketAddress}
 }
 
-func (c *Client) Listen(events chan Message) {
+func (c *Client) Listen(events *chan Message) {
 	keepAlive := time.Second * 30
 	timer := time.NewTimer(keepAlive)
 
@@ -43,7 +43,7 @@ func (c *Client) Listen(events chan Message) {
 			}
 		case message := <-msgCh:
 			{
-				events <- message
+				*events <- message
 
 				timer.Reset(keepAlive)
 

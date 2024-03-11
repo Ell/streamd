@@ -15,35 +15,16 @@ type Client struct {
 	helixClient          helix.Client
 	eventSubClient       eventsub.Client
 	subscriptions        map[string]eventsub.Condition
+	subscriptionsMutex   sync.Mutex
 	events               chan eventsub.Message
 	eventListeners       []chan eventsub.Message
-	eventListenersMutex  *sync.Mutex
+	eventListenersMutex  sync.Mutex
 	statusListeners      []chan uint
-	statusListenersMutex *sync.Mutex
+	statusListenersMutex sync.Mutex
 	User                 User
 }
 
 func NewClient(clientId, accessToken string) (*Client, error) {
-	err := ValidateAccessToken(accessToken)
-	if err != nil {
-		log.Fatalf("Unable to validate accessToken %s\n", err)
-	}
-
-	go func() {
-		ticker := time.NewTicker(10 * time.Minute)
-
-		for {
-			<-ticker.C
-
-			log.Println("Validating access token")
-
-			err := ValidateAccessToken(accessToken)
-			if err != nil {
-				log.Fatalf("Unable to validate accessToken %s\n", err)
-			}
-		}
-	}()
-
 	var client Client
 
 	eventListeners := make([]chan eventsub.Message, 0)
@@ -86,18 +67,38 @@ func NewClient(clientId, accessToken string) (*Client, error) {
 		User:            user,
 	}
 
-	go client.handleEvents(events)
-
 	return &client, nil
 }
 
 func (c *Client) Listen() {
-	c.eventSubClient.Listen(c.events)
+	err := ValidateAccessToken(c.accessToken)
+	if err != nil {
+		log.Fatalf("Unable to validate accessToken %s\n", err)
+	}
+
+	go func() {
+		ticker := time.NewTicker(10 * time.Minute)
+
+		for {
+			<-ticker.C
+
+			log.Println("Validating access token")
+
+			err := ValidateAccessToken(c.accessToken)
+			if err != nil {
+				log.Fatalf("Unable to validate accessToken %s\n", err)
+			}
+		}
+	}()
+
+	go c.handleEvents()
+
+	c.eventSubClient.Listen(&c.events)
 }
 
-func (c *Client) handleEvents(events chan eventsub.Message) {
+func (c *Client) handleEvents() {
 	for {
-		message := <-events
+		message := <-c.events
 		if message.Metadata.MessageType == "session_welcome" {
 			var payload = new(eventsub.SessionPayload)
 
@@ -148,6 +149,9 @@ func (c *Client) subscribeToEvent(condition eventsub.Condition) error {
 }
 
 func (c *Client) SubscribeToEvent(condition eventsub.Condition) error {
+	c.subscriptionsMutex.Lock()
+	defer c.subscriptionsMutex.Unlock()
+
 	c.subscriptions[condition.GetEventName()] = condition
 
 	if c.sessionId != "" {
@@ -162,9 +166,15 @@ func (c *Client) SubscribeToEvent(condition eventsub.Condition) error {
 }
 
 func (c *Client) AddEventListener(messages chan eventsub.Message) {
+	c.eventListenersMutex.Lock()
+	defer c.eventListenersMutex.Unlock()
+
 	c.eventListeners = append(c.eventListeners, messages)
 }
 
 func (c *Client) AddStatusListener(statuses chan uint) {
+	c.statusListenersMutex.Lock()
+	defer c.statusListenersMutex.Unlock()
+
 	c.statusListeners = append(c.statusListeners, statuses)
 }
