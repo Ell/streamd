@@ -4,23 +4,26 @@ import (
 	"github.com/ell/streamd/twitch/eventsub"
 	"github.com/ell/streamd/twitch/helix"
 	"log"
+	"sync"
 	"time"
 )
 
 type Client struct {
-	clientId        string
-	accessToken     string
-	sessionId       string
-	helixClient     helix.Client
-	eventSubClient  eventsub.Client
-	subscriptions   map[string]eventsub.Condition
-	events          chan eventsub.Message
-	eventListeners  []chan eventsub.Message
-	statusListeners []chan uint
-	User            User
+	clientId             string
+	accessToken          string
+	sessionId            string
+	helixClient          helix.Client
+	eventSubClient       eventsub.Client
+	subscriptions        map[string]eventsub.Condition
+	events               chan eventsub.Message
+	eventListeners       []chan eventsub.Message
+	eventListenersMutex  *sync.Mutex
+	statusListeners      []chan uint
+	statusListenersMutex *sync.Mutex
+	User                 User
 }
 
-func NewClient(clientId, accessToken string) (Client, error) {
+func NewClient(clientId, accessToken string) (*Client, error) {
 	err := ValidateAccessToken(accessToken)
 	if err != nil {
 		log.Fatalf("Unable to validate accessToken %s\n", err)
@@ -52,7 +55,7 @@ func NewClient(clientId, accessToken string) (Client, error) {
 	helixClient, err := helix.NewClient(clientId, accessToken)
 	if err != nil {
 		log.Println("Unable to create helix client", err)
-		return client, err
+		return &client, err
 	}
 
 	userData, err := helixClient.GetCurrentUser()
@@ -71,21 +74,21 @@ func NewClient(clientId, accessToken string) (Client, error) {
 	events := make(chan eventsub.Message)
 
 	client = Client{
-		clientId,
-		accessToken,
-		sessionId,
-		*helixClient,
-		eventSubClient,
-		subscriptions,
-		events,
-		eventListeners,
-		statusListeners,
-		user,
+		clientId:        clientId,
+		accessToken:     accessToken,
+		sessionId:       sessionId,
+		helixClient:     *helixClient,
+		eventSubClient:  eventSubClient,
+		subscriptions:   subscriptions,
+		events:          events,
+		eventListeners:  eventListeners,
+		statusListeners: statusListeners,
+		User:            user,
 	}
 
 	go client.handleEvents(events)
 
-	return client, nil
+	return &client, nil
 }
 
 func (c *Client) Listen() {

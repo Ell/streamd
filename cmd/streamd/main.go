@@ -19,9 +19,6 @@ func main() {
 	events := make(chan eventsub.Message)
 	client.AddEventListener(events)
 
-	log.Println("Twitch eventsub listener started")
-	go client.Listen()
-
 	chatCondition := eventsub.ChannelChatMessageCondition{
 		BroadcasterUserId: client.User.Id,
 		UserId:            client.User.Id,
@@ -30,6 +27,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to subscribe to chat messages %s\n", err)
 	}
+
+	log.Println("Twitch eventsub listener started")
+	go client.Listen()
 
 	for {
 		event := <-events
