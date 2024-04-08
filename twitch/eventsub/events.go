@@ -52,11 +52,23 @@ type ChannelChatMessageEvent struct {
 	Message              struct {
 		Text      string `json:"text"`
 		Fragments []struct {
-			Type      string      `json:"type"`
-			Text      string      `json:"text"`
-			Cheermote interface{} `json:"cheermote"`
-			Emote     interface{} `json:"emote"`
-			Mention   interface{} `json:"mention"`
+			Type      string `json:"type"`
+			Text      string `json:"text"`
+			Cheermote struct {
+				Prefix string `json:"prefix"`
+				Bits   int    `json:"bits"`
+			} `json:"cheermote,omitempty"`
+			Emote struct {
+				Id         string `json:"id"`
+				EmoteSetId string `json:"emote_set_id"`
+				OwnerId    string `json:"owner_id"`
+				Format     string `json:"format"`
+			} `json:"emote,omitempty"`
+			Mention struct {
+				UserId    string `json:"user_id"`
+				UserName  string `json:"user_name"`
+				UserLogin string `json:"user_login"`
+			} `json:"mention,omitempty"`
 		} `json:"fragments"`
 	} `json:"message"`
 	Color  string `json:"color"`
@@ -67,7 +79,7 @@ type ChannelChatMessageEvent struct {
 	} `json:"badges"`
 	MessageType string `json:"message_type"`
 	Cheer       struct {
-		bits int
+		Bits int
 	} `json:"cheer,omitempty"`
 	Reply struct {
 		ParentMessageId   string `json:"parent_message_id"`
@@ -76,6 +88,7 @@ type ChannelChatMessageEvent struct {
 		ParentUserName    string `json:"parent_user_name"`
 		ParentUserLogin   string `json:"parent_user_login"`
 		ThreadMessageId   string `json:"thread_message_id"`
+		ThreadMessageBody string `json:"thread_message_body"`
 		ThreadUserId      string `json:"thread_user_id"`
 		ThreadUserName    string `json:"thread_user_name"`
 		ThreadUserLogin   string `json:"thread_user_login"`

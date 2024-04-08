@@ -1,5 +1,0 @@
-version: '3'
-includes:
-  proto:
-    taskfile: ./proto
-    dir: ./proto

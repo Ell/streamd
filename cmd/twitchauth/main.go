@@ -1,16 +1,16 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"github.com/ell/streamd"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 )
 
 var listenAddress = "localhost:5790"
-var clientId = "4yomih22hlk0hda17lofkd9e7e3kpe"
 var scopes = []string{
 	"bits:read",
 	"channel:read:ads",
@@ -54,12 +54,18 @@ var scopes = []string{
 }
 
 func main() {
-	authUrl := buildUrl()
+	clientIdEnv := os.Getenv("TWITCH_CLIENT_ID")
+	clientId := flag.String("client_id", clientIdEnv, "twitch client id")
 
-	err := streamd.OpenInBrowser(authUrl)
-	if err != nil {
-		panic(err)
+	flag.Parse()
+
+	if clientId == nil || *clientId == "" {
+		panic("Missing TWITCH_CLIENT_ID / client_id argument")
 	}
+
+	authUrl := buildUrl(*clientId)
+
+	println(authUrl)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		response := `
@@ -85,7 +91,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(listenAddress, nil))
 }
 
-func buildUrl() string {
+func buildUrl(clientId string) string {
 	redirectUri := "http://" + listenAddress + "/"
 
 	queryValues := url.Values{}

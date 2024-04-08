@@ -1,5 +1,7 @@
 package eventsub
 
+import "errors"
+
 type Condition interface {
 	GetEventName() string
 	GetEventVersion() string
@@ -10,11 +12,11 @@ type ChannelFollowCondition struct {
 	ModeratorUserId   string `json:"moderator_user_id"`
 }
 
-func (c ChannelFollowCondition) GetEventName() string {
+func (c *ChannelFollowCondition) GetEventName() string {
 	return "channel.follow"
 }
 
-func (c ChannelFollowCondition) GetEventVersion() string {
+func (c *ChannelFollowCondition) GetEventVersion() string {
 	return "2"
 }
 
@@ -22,11 +24,11 @@ type ChannelAdBreakBeginsCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelAdBreakBeginsCondition) GetEventName() string {
+func (c *ChannelAdBreakBeginsCondition) GetEventName() string {
 	return "channel.ad_break.begin"
 }
 
-func (c ChannelAdBreakBeginsCondition) GetEventVersion() string {
+func (c *ChannelAdBreakBeginsCondition) GetEventVersion() string {
 	return "2"
 }
 
@@ -35,11 +37,11 @@ type ChannelChatMessageCondition struct {
 	UserId            string `json:"user_id"`
 }
 
-func (c ChannelChatMessageCondition) GetEventName() string {
+func (c *ChannelChatMessageCondition) GetEventName() string {
 	return "channel.chat.message"
 }
 
-func (c ChannelChatMessageCondition) GetEventVersion() string {
+func (c *ChannelChatMessageCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -47,11 +49,11 @@ type ChannelSubscribeCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelSubscribeCondition) GetEventName() string {
+func (c *ChannelSubscribeCondition) GetEventName() string {
 	return "channel.subscribe"
 }
 
-func (c ChannelSubscribeCondition) GetEventVersion() string {
+func (c *ChannelSubscribeCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -59,11 +61,11 @@ type ChannelSubscriptionGiftCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelSubscriptionGiftCondition) GetEventName() string {
+func (c *ChannelSubscriptionGiftCondition) GetEventName() string {
 	return "channel.subscription.gift"
 }
 
-func (c ChannelSubscriptionGiftCondition) GetEventVersion() string {
+func (c *ChannelSubscriptionGiftCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -71,11 +73,11 @@ type ChannelCheerCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelCheerCondition) GetEventName() string {
+func (c *ChannelCheerCondition) GetEventName() string {
 	return "channel.cheer"
 }
 
-func (c ChannelCheerCondition) GetEventVersion() string {
+func (c *ChannelCheerCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -83,11 +85,11 @@ type ChannelRaidCondition struct {
 	ToBroadcasterUserId string `json:"to_broadcaster_user_id"`
 }
 
-func (c ChannelRaidCondition) GetEventName() string {
+func (c *ChannelRaidCondition) GetEventName() string {
 	return "channel.raid"
 }
 
-func (c ChannelRaidCondition) GetEventVersion() string {
+func (c *ChannelRaidCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -96,11 +98,11 @@ type ChannelPointsCustomRewardRedemptionAddCondition struct {
 	RewardId          string `json:"reward_id,omitempty"`
 }
 
-func (c ChannelPointsCustomRewardRedemptionAddCondition) GetEventName() string {
+func (c *ChannelPointsCustomRewardRedemptionAddCondition) GetEventName() string {
 	return "channel.channel_points_custom_reward_redemption.add"
 }
 
-func (c ChannelPointsCustomRewardRedemptionAddCondition) GetEventVersion() string {
+func (c *ChannelPointsCustomRewardRedemptionAddCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -108,11 +110,11 @@ type ChannelPollBeginCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelPollBeginCondition) GetEventName() string {
+func (c *ChannelPollBeginCondition) GetEventName() string {
 	return "channel.poll.begin"
 }
 
-func (c ChannelPollBeginCondition) GetEventVersion() string {
+func (c *ChannelPollBeginCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -120,11 +122,11 @@ type ChannelPollProgressCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelPollProgressCondition) GetEventName() string {
+func (c *ChannelPollProgressCondition) GetEventName() string {
 	return "channel.poll.progress"
 }
 
-func (c ChannelPollProgressCondition) GetEventVersion() string {
+func (c *ChannelPollProgressCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -132,11 +134,11 @@ type ChannelPollEndCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelPollEndCondition) GetEventName() string {
+func (c *ChannelPollEndCondition) GetEventName() string {
 	return "channel.poll.end"
 }
 
-func (c ChannelPollEndCondition) GetEventVersion() string {
+func (c *ChannelPollEndCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -144,11 +146,11 @@ type ChannelPredictionBeginCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelPredictionBeginCondition) GetEventName() string {
+func (c *ChannelPredictionBeginCondition) GetEventName() string {
 	return "channel.prediction.begin"
 }
 
-func (c ChannelPredictionBeginCondition) GetEventVersion() string {
+func (c *ChannelPredictionBeginCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -156,11 +158,11 @@ type ChannelPredictionProgressCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelPredictionProgressCondition) GetEventName() string {
+func (c *ChannelPredictionProgressCondition) GetEventName() string {
 	return "channel.prediction.progress"
 }
 
-func (c ChannelPredictionProgressCondition) GetEventVersion() string {
+func (c *ChannelPredictionProgressCondition) GetEventVersion() string {
 	return "1"
 }
 
@@ -168,10 +170,45 @@ type ChannelPredictionEndCondition struct {
 	BroadcasterUserId string `json:"broadcaster_user_id"`
 }
 
-func (c ChannelPredictionEndCondition) GetEventName() string {
+func (c *ChannelPredictionEndCondition) GetEventName() string {
 	return "channel.prediction.end"
 }
 
-func (c ChannelPredictionEndCondition) GetEventVersion() string {
+func (c *ChannelPredictionEndCondition) GetEventVersion() string {
 	return "1"
+}
+
+func GetConditionForConditionName(name string) (Condition, error) {
+	switch name {
+	case "channel.follow":
+		return &ChannelFollowCondition{}, nil
+	case "channel.ad_break.begin":
+		return &ChannelAdBreakBeginsCondition{}, nil
+	case "channel.chat.message":
+		return &ChannelChatMessageCondition{}, nil
+	case "channel.subscribe":
+		return &ChannelSubscribeCondition{}, nil
+	case "channel.subscription.gift":
+		return &ChannelSubscriptionGiftCondition{}, nil
+	case "channel.cheer":
+		return &ChannelCheerCondition{}, nil
+	case "channel.raid":
+		return &ChannelRaidCondition{}, nil
+	case "channel.channel_points_custom_reward_redemption.add":
+		return &ChannelPointsCustomRewardRedemptionAddCondition{}, nil
+	case "channel.poll.begin":
+		return &ChannelPollBeginCondition{}, nil
+	case "channel.poll.progress":
+		return &ChannelPollProgressCondition{}, nil
+	case "channel.poll.end":
+		return &ChannelPollEndCondition{}, nil
+	case "channel.prediction.begin":
+		return &ChannelPredictionBeginCondition{}, nil
+	case "channel.prediction.progress":
+		return &ChannelPredictionProgressCondition{}, nil
+	case "channel.prediction.end":
+		return &ChannelPredictionEndCondition{}, nil
+	}
+
+	return nil, errors.New("unknown condition name")
 }

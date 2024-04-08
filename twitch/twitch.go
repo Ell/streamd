@@ -5,176 +5,156 @@ import (
 	"github.com/ell/streamd/twitch/helix"
 	"log"
 	"sync"
-	"time"
 )
 
-type Client struct {
-	clientId             string
-	accessToken          string
-	sessionId            string
-	helixClient          helix.Client
-	eventSubClient       eventsub.Client
-	subscriptions        map[string]eventsub.Condition
-	subscriptionsMutex   sync.Mutex
-	events               chan eventsub.Message
-	eventListeners       []chan eventsub.Message
-	eventListenersMutex  sync.Mutex
-	statusListeners      []chan uint
-	statusListenersMutex sync.Mutex
-	User                 User
+type subscription struct {
+	Condition eventsub.Condition
+	Id        string
 }
 
-func NewClient(clientId, accessToken string) (*Client, error) {
-	var client Client
+type Client struct {
+	ClientId      string
+	AccessToken   string
+	sessionId     string
+	subscriptions []*subscription
+	listeners     []chan eventsub.Message
+	Helix         helix.Client
+	Eventsub      eventsub.Client
+	lock          sync.Mutex
+}
 
-	eventListeners := make([]chan eventsub.Message, 0)
-	statusListeners := make([]chan uint, 0)
+func NewClient(clientId, accessToken string) *Client {
+	eventsubClient := eventsub.NewClient()
+	helixClient := helix.NewClient(clientId, accessToken)
 
-	sessionId := ""
-	subscriptions := make(map[string]eventsub.Condition)
-
-	helixClient, err := helix.NewClient(clientId, accessToken)
-	if err != nil {
-		log.Println("Unable to create helix client", err)
-		return &client, err
+	client := &Client{
+		ClientId:    clientId,
+		AccessToken: accessToken,
+		Eventsub:    eventsubClient,
+		Helix:       *helixClient,
 	}
 
-	userData, err := helixClient.GetCurrentUser()
-	if err != nil {
-		log.Fatalf("Unable to get current user from helix client %s\n", err)
+	return client
+}
+
+func NewTestClient(clientId, accessToken, wsAddress, apiAddress string) *Client {
+	eventsubClient := eventsub.NewTestClient(wsAddress)
+	helixClient := helix.NewTestClient(clientId, accessToken, apiAddress)
+
+	client := &Client{
+		ClientId:    clientId,
+		AccessToken: accessToken,
+		Eventsub:    eventsubClient,
+		Helix:       *helixClient,
 	}
 
-	user := User{
-		Id:          userData.Id,
-		Username:    userData.Login,
-		Displayname: userData.DisplayName,
+	return client
+}
+
+func (c *Client) AddListener() *chan eventsub.Message {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	ch := make(chan eventsub.Message)
+	c.listeners = append(c.listeners, ch)
+
+	return &ch
+}
+
+func (c *Client) Listen(conditions ...eventsub.Condition) {
+	c.lock.Lock()
+
+	for _, condition := range conditions {
+		sub := subscription{
+			Condition: condition,
+			Id:        "",
+		}
+
+		c.subscriptions = append(c.subscriptions, &sub)
 	}
 
-	eventSubClient := eventsub.NewClient()
+	c.lock.Unlock()
 
 	events := make(chan eventsub.Message)
 
-	client = Client{
-		clientId:        clientId,
-		accessToken:     accessToken,
-		sessionId:       sessionId,
-		helixClient:     *helixClient,
-		eventSubClient:  eventSubClient,
-		subscriptions:   subscriptions,
-		events:          events,
-		eventListeners:  eventListeners,
-		statusListeners: statusListeners,
-		User:            user,
-	}
+	go c.Eventsub.Listen(&events)
 
-	return &client, nil
-}
-
-func (c *Client) Listen() {
-	err := ValidateAccessToken(c.accessToken)
-	if err != nil {
-		log.Fatalf("Unable to validate accessToken %s\n", err)
-	}
-
-	go func() {
-		ticker := time.NewTicker(10 * time.Minute)
-
-		for {
-			<-ticker.C
-
-			log.Println("Validating access token")
-
-			err := ValidateAccessToken(c.accessToken)
-			if err != nil {
-				log.Fatalf("Unable to validate accessToken %s\n", err)
-			}
-		}
-	}()
-
-	go c.handleEvents()
-
-	c.eventSubClient.Listen(&c.events)
-}
-
-func (c *Client) handleEvents() {
 	for {
-		message := <-c.events
-		if message.Metadata.MessageType == "session_welcome" {
-			var payload = new(eventsub.SessionPayload)
+		message := <-events
 
-			err := eventsub.UnmarshalMessagePayload(&message, &payload)
-			if err != nil {
-				log.Fatalf("Unable to unmarshal event payload %s\n", err)
+		switch message.Metadata.MessageType {
+		case "session_welcome":
+			{
+				var payload = &eventsub.SessionPayload{}
+
+				err := eventsub.UnmarshalMessagePayload(&message, &payload)
+				if err != nil {
+					log.Fatalf("Unable to unmarshal event payload %s\n", err)
+				}
+
+				log.Println("Connected to Eventsub")
+
+				for _, sub := range c.subscriptions {
+					id, err := c.Helix.SubscribeToEvent(sub.Condition.GetEventName(), sub.Condition.GetEventVersion(), sub.Condition, payload.Session.Id)
+					if err != nil {
+						log.Fatalf("Unable to subscribe to Eventsub event %s\n", err)
+					}
+
+					log.Println("Subscribed to event with id", id)
+
+					c.lock.Lock()
+					sub.Id = id
+					c.lock.Unlock()
+				}
+
+				c.sessionId = payload.Session.Id
 			}
+		case "notification":
+			{
+				conditionName := message.Metadata.SubscriptionType
+				condition, err := eventsub.GetConditionForConditionName(message.Metadata.SubscriptionType)
+				if err != nil {
+					log.Println("Unknown subscription type received", conditionName)
+					continue
+				}
 
-			c.sessionId = payload.Session.Id
+				log.Printf("Got notification for %s event\n", condition.GetEventName())
 
-			err = c.subscribeToEvents()
-			if err != nil {
-				log.Fatalf("Unable to subscribe to events %s\n", err)
-			}
-		}
+				c.lock.Lock()
 
-		if message.Metadata.MessageType == "notification" {
-			for _, listener := range c.eventListeners {
-				listener := listener
+				listeners := make([]chan eventsub.Message, 0)
+				for i, listener := range c.listeners {
+					select {
+					case <-listener:
+						listeners = append(c.listeners[:i], c.listeners[i+1:]...)
+						c.listeners = listeners
+						continue
+					default:
+						listener <- message
+						continue
+					}
+				}
 
-				go func() {
-					listener <- message
-				}()
+				c.lock.Unlock()
 			}
 		}
 	}
-}
-
-func (c *Client) subscribeToEvents() error {
-	for _, condition := range c.subscriptions {
-		log.Println("Subscribing to event", condition.GetEventName())
-
-		err := c.subscribeToEvent(condition)
-		if err != nil {
-			log.Println("Unable to subscribe to event", err)
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (c *Client) subscribeToEvent(condition eventsub.Condition) error {
-	eventName := condition.GetEventName()
-	eventVersion := condition.GetEventVersion()
+	c.lock.Lock()
+	defer c.lock.Unlock()
 
-	return c.helixClient.SubscribeToEvent(eventName, eventVersion, condition, c.sessionId)
-}
-
-func (c *Client) SubscribeToEvent(condition eventsub.Condition) error {
-	c.subscriptionsMutex.Lock()
-	defer c.subscriptionsMutex.Unlock()
-
-	c.subscriptions[condition.GetEventName()] = condition
+	subId := ""
 
 	if c.sessionId != "" {
-		err := c.subscribeToEvent(condition)
-		if err != nil {
-			log.Println("Unable to subscribe to event", err)
-			return err
-		}
+		subId, _ = c.Helix.SubscribeToEvent(condition.GetEventName(), condition.GetEventVersion(), condition, c.sessionId)
 	}
 
+	c.subscriptions = append(c.subscriptions, &subscription{
+		Condition: condition,
+		Id:        subId,
+	})
+
 	return nil
-}
-
-func (c *Client) AddEventListener(messages chan eventsub.Message) {
-	c.eventListenersMutex.Lock()
-	defer c.eventListenersMutex.Unlock()
-
-	c.eventListeners = append(c.eventListeners, messages)
-}
-
-func (c *Client) AddStatusListener(statuses chan uint) {
-	c.statusListenersMutex.Lock()
-	defer c.statusListenersMutex.Unlock()
-
-	c.statusListeners = append(c.statusListeners, statuses)
 }

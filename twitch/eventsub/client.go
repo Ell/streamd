@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-const (
-	ClientConnected = iota
-	ClientDisconnected
-)
-
 type Client struct {
 	socketAddress string
 }
@@ -40,6 +35,7 @@ func (c *Client) Listen(events *chan Message) {
 				time.Sleep(time.Second * 5)
 				log.Println("Reconnecting to twitch eventsub")
 				go connectToSocket(c.socketAddress, msgCh, cancelCh, socketFinishedCh)
+				log.Println("Reconnected to twitch eventsub")
 			}
 		case message := <-msgCh:
 			{

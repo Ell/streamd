@@ -33,20 +33,74 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// TwitchServiceGetCurrentUserInfoProcedure is the fully-qualified name of the TwitchService's
-	// GetCurrentUserInfo RPC.
-	TwitchServiceGetCurrentUserInfoProcedure = "/twitch.v1.TwitchService/GetCurrentUserInfo"
+	// TwitchServiceSubscribeToEventsProcedure is the fully-qualified name of the TwitchService's
+	// SubscribeToEvents RPC.
+	TwitchServiceSubscribeToEventsProcedure = "/twitch.v1.TwitchService/SubscribeToEvents"
+	// TwitchServiceSendChatMessageProcedure is the fully-qualified name of the TwitchService's
+	// SendChatMessage RPC.
+	TwitchServiceSendChatMessageProcedure = "/twitch.v1.TwitchService/SendChatMessage"
+	// TwitchServiceGetUsersProcedure is the fully-qualified name of the TwitchService's GetUsers RPC.
+	TwitchServiceGetUsersProcedure = "/twitch.v1.TwitchService/GetUsers"
+	// TwitchServiceCreateCustomRewardProcedure is the fully-qualified name of the TwitchService's
+	// CreateCustomReward RPC.
+	TwitchServiceCreateCustomRewardProcedure = "/twitch.v1.TwitchService/CreateCustomReward"
+	// TwitchServiceGetCustomRewardsProcedure is the fully-qualified name of the TwitchService's
+	// GetCustomRewards RPC.
+	TwitchServiceGetCustomRewardsProcedure = "/twitch.v1.TwitchService/GetCustomRewards"
+	// TwitchServiceUpdateCustomRewardProcedure is the fully-qualified name of the TwitchService's
+	// UpdateCustomReward RPC.
+	TwitchServiceUpdateCustomRewardProcedure = "/twitch.v1.TwitchService/UpdateCustomReward"
+	// TwitchServiceDeleteCustomRewardProcedure is the fully-qualified name of the TwitchService's
+	// DeleteCustomReward RPC.
+	TwitchServiceDeleteCustomRewardProcedure = "/twitch.v1.TwitchService/DeleteCustomReward"
+	// TwitchServiceGetChannelInformationProcedure is the fully-qualified name of the TwitchService's
+	// GetChannelInformation RPC.
+	TwitchServiceGetChannelInformationProcedure = "/twitch.v1.TwitchService/GetChannelInformation"
+	// TwitchServiceUpdateRedemptionStatusProcedure is the fully-qualified name of the TwitchService's
+	// UpdateRedemptionStatus RPC.
+	TwitchServiceUpdateRedemptionStatusProcedure = "/twitch.v1.TwitchService/UpdateRedemptionStatus"
+	// TwitchServiceSendShoutoutProcedure is the fully-qualified name of the TwitchService's
+	// SendShoutout RPC.
+	TwitchServiceSendShoutoutProcedure = "/twitch.v1.TwitchService/SendShoutout"
+	// TwitchServiceSendAnnouncementProcedure is the fully-qualified name of the TwitchService's
+	// SendAnnouncement RPC.
+	TwitchServiceSendAnnouncementProcedure = "/twitch.v1.TwitchService/SendAnnouncement"
+	// TwitchServiceGetChattersProcedure is the fully-qualified name of the TwitchService's GetChatters
+	// RPC.
+	TwitchServiceGetChattersProcedure = "/twitch.v1.TwitchService/GetChatters"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	twitchServiceServiceDescriptor                  = v1.File_twitch_v1_twitch_proto.Services().ByName("TwitchService")
-	twitchServiceGetCurrentUserInfoMethodDescriptor = twitchServiceServiceDescriptor.Methods().ByName("GetCurrentUserInfo")
+	twitchServiceServiceDescriptor                      = v1.File_twitch_v1_twitch_proto.Services().ByName("TwitchService")
+	twitchServiceSubscribeToEventsMethodDescriptor      = twitchServiceServiceDescriptor.Methods().ByName("SubscribeToEvents")
+	twitchServiceSendChatMessageMethodDescriptor        = twitchServiceServiceDescriptor.Methods().ByName("SendChatMessage")
+	twitchServiceGetUsersMethodDescriptor               = twitchServiceServiceDescriptor.Methods().ByName("GetUsers")
+	twitchServiceCreateCustomRewardMethodDescriptor     = twitchServiceServiceDescriptor.Methods().ByName("CreateCustomReward")
+	twitchServiceGetCustomRewardsMethodDescriptor       = twitchServiceServiceDescriptor.Methods().ByName("GetCustomRewards")
+	twitchServiceUpdateCustomRewardMethodDescriptor     = twitchServiceServiceDescriptor.Methods().ByName("UpdateCustomReward")
+	twitchServiceDeleteCustomRewardMethodDescriptor     = twitchServiceServiceDescriptor.Methods().ByName("DeleteCustomReward")
+	twitchServiceGetChannelInformationMethodDescriptor  = twitchServiceServiceDescriptor.Methods().ByName("GetChannelInformation")
+	twitchServiceUpdateRedemptionStatusMethodDescriptor = twitchServiceServiceDescriptor.Methods().ByName("UpdateRedemptionStatus")
+	twitchServiceSendShoutoutMethodDescriptor           = twitchServiceServiceDescriptor.Methods().ByName("SendShoutout")
+	twitchServiceSendAnnouncementMethodDescriptor       = twitchServiceServiceDescriptor.Methods().ByName("SendAnnouncement")
+	twitchServiceGetChattersMethodDescriptor            = twitchServiceServiceDescriptor.Methods().ByName("GetChatters")
 )
 
 // TwitchServiceClient is a client for the twitch.v1.TwitchService service.
 type TwitchServiceClient interface {
-	GetCurrentUserInfo(context.Context, *connect.Request[v1.GetCurrentUserInfoRequest]) (*connect.Response[v1.GetCurrentUserInfoResponse], error)
+	SubscribeToEvents(context.Context, *connect.Request[v1.SubscribeToEventsRequest]) (*connect.ServerStreamForClient[v1.SubscribeToEventsResponse], error)
+	SendChatMessage(context.Context, *connect.Request[v1.SendChatMessageRequest]) (*connect.Response[v1.SendChatMessageResponse], error)
+	GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error)
+	CreateCustomReward(context.Context, *connect.Request[v1.CreateCustomRewardRequest]) (*connect.Response[v1.CreateCustomRewardResponse], error)
+	GetCustomRewards(context.Context, *connect.Request[v1.GetCustomRewardsRequest]) (*connect.Response[v1.GetCustomRewardsResponse], error)
+	UpdateCustomReward(context.Context, *connect.Request[v1.UpdateCustomRewardRequest]) (*connect.Response[v1.UpdateCustomRewardResponse], error)
+	DeleteCustomReward(context.Context, *connect.Request[v1.DeleteCustomRewardRequest]) (*connect.Response[v1.DeleteCustomRewardResponse], error)
+	GetChannelInformation(context.Context, *connect.Request[v1.GetChannelInformationRequest]) (*connect.Response[v1.GetChannelInformationResponse], error)
+	UpdateRedemptionStatus(context.Context, *connect.Request[v1.UpdateRedemptionStatusRequest]) (*connect.Response[v1.UpdateRedemptionStatusResponse], error)
+	SendShoutout(context.Context, *connect.Request[v1.SendShoutoutRequest]) (*connect.Response[v1.SendShoutoutResponse], error)
+	SendAnnouncement(context.Context, *connect.Request[v1.SendAnnouncementRequest]) (*connect.Response[v1.SendAnnouncementResponse], error)
+	GetChatters(context.Context, *connect.Request[v1.GetChattersRequest]) (*connect.Response[v1.GetChattersResponse], error)
 }
 
 // NewTwitchServiceClient constructs a client for the twitch.v1.TwitchService service. By default,
@@ -59,10 +113,76 @@ type TwitchServiceClient interface {
 func NewTwitchServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) TwitchServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &twitchServiceClient{
-		getCurrentUserInfo: connect.NewClient[v1.GetCurrentUserInfoRequest, v1.GetCurrentUserInfoResponse](
+		subscribeToEvents: connect.NewClient[v1.SubscribeToEventsRequest, v1.SubscribeToEventsResponse](
 			httpClient,
-			baseURL+TwitchServiceGetCurrentUserInfoProcedure,
-			connect.WithSchema(twitchServiceGetCurrentUserInfoMethodDescriptor),
+			baseURL+TwitchServiceSubscribeToEventsProcedure,
+			connect.WithSchema(twitchServiceSubscribeToEventsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		sendChatMessage: connect.NewClient[v1.SendChatMessageRequest, v1.SendChatMessageResponse](
+			httpClient,
+			baseURL+TwitchServiceSendChatMessageProcedure,
+			connect.WithSchema(twitchServiceSendChatMessageMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getUsers: connect.NewClient[v1.GetUsersRequest, v1.GetUsersResponse](
+			httpClient,
+			baseURL+TwitchServiceGetUsersProcedure,
+			connect.WithSchema(twitchServiceGetUsersMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		createCustomReward: connect.NewClient[v1.CreateCustomRewardRequest, v1.CreateCustomRewardResponse](
+			httpClient,
+			baseURL+TwitchServiceCreateCustomRewardProcedure,
+			connect.WithSchema(twitchServiceCreateCustomRewardMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getCustomRewards: connect.NewClient[v1.GetCustomRewardsRequest, v1.GetCustomRewardsResponse](
+			httpClient,
+			baseURL+TwitchServiceGetCustomRewardsProcedure,
+			connect.WithSchema(twitchServiceGetCustomRewardsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		updateCustomReward: connect.NewClient[v1.UpdateCustomRewardRequest, v1.UpdateCustomRewardResponse](
+			httpClient,
+			baseURL+TwitchServiceUpdateCustomRewardProcedure,
+			connect.WithSchema(twitchServiceUpdateCustomRewardMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		deleteCustomReward: connect.NewClient[v1.DeleteCustomRewardRequest, v1.DeleteCustomRewardResponse](
+			httpClient,
+			baseURL+TwitchServiceDeleteCustomRewardProcedure,
+			connect.WithSchema(twitchServiceDeleteCustomRewardMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getChannelInformation: connect.NewClient[v1.GetChannelInformationRequest, v1.GetChannelInformationResponse](
+			httpClient,
+			baseURL+TwitchServiceGetChannelInformationProcedure,
+			connect.WithSchema(twitchServiceGetChannelInformationMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		updateRedemptionStatus: connect.NewClient[v1.UpdateRedemptionStatusRequest, v1.UpdateRedemptionStatusResponse](
+			httpClient,
+			baseURL+TwitchServiceUpdateRedemptionStatusProcedure,
+			connect.WithSchema(twitchServiceUpdateRedemptionStatusMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		sendShoutout: connect.NewClient[v1.SendShoutoutRequest, v1.SendShoutoutResponse](
+			httpClient,
+			baseURL+TwitchServiceSendShoutoutProcedure,
+			connect.WithSchema(twitchServiceSendShoutoutMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		sendAnnouncement: connect.NewClient[v1.SendAnnouncementRequest, v1.SendAnnouncementResponse](
+			httpClient,
+			baseURL+TwitchServiceSendAnnouncementProcedure,
+			connect.WithSchema(twitchServiceSendAnnouncementMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getChatters: connect.NewClient[v1.GetChattersRequest, v1.GetChattersResponse](
+			httpClient,
+			baseURL+TwitchServiceGetChattersProcedure,
+			connect.WithSchema(twitchServiceGetChattersMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -70,17 +190,94 @@ func NewTwitchServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 
 // twitchServiceClient implements TwitchServiceClient.
 type twitchServiceClient struct {
-	getCurrentUserInfo *connect.Client[v1.GetCurrentUserInfoRequest, v1.GetCurrentUserInfoResponse]
+	subscribeToEvents      *connect.Client[v1.SubscribeToEventsRequest, v1.SubscribeToEventsResponse]
+	sendChatMessage        *connect.Client[v1.SendChatMessageRequest, v1.SendChatMessageResponse]
+	getUsers               *connect.Client[v1.GetUsersRequest, v1.GetUsersResponse]
+	createCustomReward     *connect.Client[v1.CreateCustomRewardRequest, v1.CreateCustomRewardResponse]
+	getCustomRewards       *connect.Client[v1.GetCustomRewardsRequest, v1.GetCustomRewardsResponse]
+	updateCustomReward     *connect.Client[v1.UpdateCustomRewardRequest, v1.UpdateCustomRewardResponse]
+	deleteCustomReward     *connect.Client[v1.DeleteCustomRewardRequest, v1.DeleteCustomRewardResponse]
+	getChannelInformation  *connect.Client[v1.GetChannelInformationRequest, v1.GetChannelInformationResponse]
+	updateRedemptionStatus *connect.Client[v1.UpdateRedemptionStatusRequest, v1.UpdateRedemptionStatusResponse]
+	sendShoutout           *connect.Client[v1.SendShoutoutRequest, v1.SendShoutoutResponse]
+	sendAnnouncement       *connect.Client[v1.SendAnnouncementRequest, v1.SendAnnouncementResponse]
+	getChatters            *connect.Client[v1.GetChattersRequest, v1.GetChattersResponse]
 }
 
-// GetCurrentUserInfo calls twitch.v1.TwitchService.GetCurrentUserInfo.
-func (c *twitchServiceClient) GetCurrentUserInfo(ctx context.Context, req *connect.Request[v1.GetCurrentUserInfoRequest]) (*connect.Response[v1.GetCurrentUserInfoResponse], error) {
-	return c.getCurrentUserInfo.CallUnary(ctx, req)
+// SubscribeToEvents calls twitch.v1.TwitchService.SubscribeToEvents.
+func (c *twitchServiceClient) SubscribeToEvents(ctx context.Context, req *connect.Request[v1.SubscribeToEventsRequest]) (*connect.ServerStreamForClient[v1.SubscribeToEventsResponse], error) {
+	return c.subscribeToEvents.CallServerStream(ctx, req)
+}
+
+// SendChatMessage calls twitch.v1.TwitchService.SendChatMessage.
+func (c *twitchServiceClient) SendChatMessage(ctx context.Context, req *connect.Request[v1.SendChatMessageRequest]) (*connect.Response[v1.SendChatMessageResponse], error) {
+	return c.sendChatMessage.CallUnary(ctx, req)
+}
+
+// GetUsers calls twitch.v1.TwitchService.GetUsers.
+func (c *twitchServiceClient) GetUsers(ctx context.Context, req *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error) {
+	return c.getUsers.CallUnary(ctx, req)
+}
+
+// CreateCustomReward calls twitch.v1.TwitchService.CreateCustomReward.
+func (c *twitchServiceClient) CreateCustomReward(ctx context.Context, req *connect.Request[v1.CreateCustomRewardRequest]) (*connect.Response[v1.CreateCustomRewardResponse], error) {
+	return c.createCustomReward.CallUnary(ctx, req)
+}
+
+// GetCustomRewards calls twitch.v1.TwitchService.GetCustomRewards.
+func (c *twitchServiceClient) GetCustomRewards(ctx context.Context, req *connect.Request[v1.GetCustomRewardsRequest]) (*connect.Response[v1.GetCustomRewardsResponse], error) {
+	return c.getCustomRewards.CallUnary(ctx, req)
+}
+
+// UpdateCustomReward calls twitch.v1.TwitchService.UpdateCustomReward.
+func (c *twitchServiceClient) UpdateCustomReward(ctx context.Context, req *connect.Request[v1.UpdateCustomRewardRequest]) (*connect.Response[v1.UpdateCustomRewardResponse], error) {
+	return c.updateCustomReward.CallUnary(ctx, req)
+}
+
+// DeleteCustomReward calls twitch.v1.TwitchService.DeleteCustomReward.
+func (c *twitchServiceClient) DeleteCustomReward(ctx context.Context, req *connect.Request[v1.DeleteCustomRewardRequest]) (*connect.Response[v1.DeleteCustomRewardResponse], error) {
+	return c.deleteCustomReward.CallUnary(ctx, req)
+}
+
+// GetChannelInformation calls twitch.v1.TwitchService.GetChannelInformation.
+func (c *twitchServiceClient) GetChannelInformation(ctx context.Context, req *connect.Request[v1.GetChannelInformationRequest]) (*connect.Response[v1.GetChannelInformationResponse], error) {
+	return c.getChannelInformation.CallUnary(ctx, req)
+}
+
+// UpdateRedemptionStatus calls twitch.v1.TwitchService.UpdateRedemptionStatus.
+func (c *twitchServiceClient) UpdateRedemptionStatus(ctx context.Context, req *connect.Request[v1.UpdateRedemptionStatusRequest]) (*connect.Response[v1.UpdateRedemptionStatusResponse], error) {
+	return c.updateRedemptionStatus.CallUnary(ctx, req)
+}
+
+// SendShoutout calls twitch.v1.TwitchService.SendShoutout.
+func (c *twitchServiceClient) SendShoutout(ctx context.Context, req *connect.Request[v1.SendShoutoutRequest]) (*connect.Response[v1.SendShoutoutResponse], error) {
+	return c.sendShoutout.CallUnary(ctx, req)
+}
+
+// SendAnnouncement calls twitch.v1.TwitchService.SendAnnouncement.
+func (c *twitchServiceClient) SendAnnouncement(ctx context.Context, req *connect.Request[v1.SendAnnouncementRequest]) (*connect.Response[v1.SendAnnouncementResponse], error) {
+	return c.sendAnnouncement.CallUnary(ctx, req)
+}
+
+// GetChatters calls twitch.v1.TwitchService.GetChatters.
+func (c *twitchServiceClient) GetChatters(ctx context.Context, req *connect.Request[v1.GetChattersRequest]) (*connect.Response[v1.GetChattersResponse], error) {
+	return c.getChatters.CallUnary(ctx, req)
 }
 
 // TwitchServiceHandler is an implementation of the twitch.v1.TwitchService service.
 type TwitchServiceHandler interface {
-	GetCurrentUserInfo(context.Context, *connect.Request[v1.GetCurrentUserInfoRequest]) (*connect.Response[v1.GetCurrentUserInfoResponse], error)
+	SubscribeToEvents(context.Context, *connect.Request[v1.SubscribeToEventsRequest], *connect.ServerStream[v1.SubscribeToEventsResponse]) error
+	SendChatMessage(context.Context, *connect.Request[v1.SendChatMessageRequest]) (*connect.Response[v1.SendChatMessageResponse], error)
+	GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error)
+	CreateCustomReward(context.Context, *connect.Request[v1.CreateCustomRewardRequest]) (*connect.Response[v1.CreateCustomRewardResponse], error)
+	GetCustomRewards(context.Context, *connect.Request[v1.GetCustomRewardsRequest]) (*connect.Response[v1.GetCustomRewardsResponse], error)
+	UpdateCustomReward(context.Context, *connect.Request[v1.UpdateCustomRewardRequest]) (*connect.Response[v1.UpdateCustomRewardResponse], error)
+	DeleteCustomReward(context.Context, *connect.Request[v1.DeleteCustomRewardRequest]) (*connect.Response[v1.DeleteCustomRewardResponse], error)
+	GetChannelInformation(context.Context, *connect.Request[v1.GetChannelInformationRequest]) (*connect.Response[v1.GetChannelInformationResponse], error)
+	UpdateRedemptionStatus(context.Context, *connect.Request[v1.UpdateRedemptionStatusRequest]) (*connect.Response[v1.UpdateRedemptionStatusResponse], error)
+	SendShoutout(context.Context, *connect.Request[v1.SendShoutoutRequest]) (*connect.Response[v1.SendShoutoutResponse], error)
+	SendAnnouncement(context.Context, *connect.Request[v1.SendAnnouncementRequest]) (*connect.Response[v1.SendAnnouncementResponse], error)
+	GetChatters(context.Context, *connect.Request[v1.GetChattersRequest]) (*connect.Response[v1.GetChattersResponse], error)
 }
 
 // NewTwitchServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -89,16 +286,104 @@ type TwitchServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewTwitchServiceHandler(svc TwitchServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	twitchServiceGetCurrentUserInfoHandler := connect.NewUnaryHandler(
-		TwitchServiceGetCurrentUserInfoProcedure,
-		svc.GetCurrentUserInfo,
-		connect.WithSchema(twitchServiceGetCurrentUserInfoMethodDescriptor),
+	twitchServiceSubscribeToEventsHandler := connect.NewServerStreamHandler(
+		TwitchServiceSubscribeToEventsProcedure,
+		svc.SubscribeToEvents,
+		connect.WithSchema(twitchServiceSubscribeToEventsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceSendChatMessageHandler := connect.NewUnaryHandler(
+		TwitchServiceSendChatMessageProcedure,
+		svc.SendChatMessage,
+		connect.WithSchema(twitchServiceSendChatMessageMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceGetUsersHandler := connect.NewUnaryHandler(
+		TwitchServiceGetUsersProcedure,
+		svc.GetUsers,
+		connect.WithSchema(twitchServiceGetUsersMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceCreateCustomRewardHandler := connect.NewUnaryHandler(
+		TwitchServiceCreateCustomRewardProcedure,
+		svc.CreateCustomReward,
+		connect.WithSchema(twitchServiceCreateCustomRewardMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceGetCustomRewardsHandler := connect.NewUnaryHandler(
+		TwitchServiceGetCustomRewardsProcedure,
+		svc.GetCustomRewards,
+		connect.WithSchema(twitchServiceGetCustomRewardsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceUpdateCustomRewardHandler := connect.NewUnaryHandler(
+		TwitchServiceUpdateCustomRewardProcedure,
+		svc.UpdateCustomReward,
+		connect.WithSchema(twitchServiceUpdateCustomRewardMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceDeleteCustomRewardHandler := connect.NewUnaryHandler(
+		TwitchServiceDeleteCustomRewardProcedure,
+		svc.DeleteCustomReward,
+		connect.WithSchema(twitchServiceDeleteCustomRewardMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceGetChannelInformationHandler := connect.NewUnaryHandler(
+		TwitchServiceGetChannelInformationProcedure,
+		svc.GetChannelInformation,
+		connect.WithSchema(twitchServiceGetChannelInformationMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceUpdateRedemptionStatusHandler := connect.NewUnaryHandler(
+		TwitchServiceUpdateRedemptionStatusProcedure,
+		svc.UpdateRedemptionStatus,
+		connect.WithSchema(twitchServiceUpdateRedemptionStatusMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceSendShoutoutHandler := connect.NewUnaryHandler(
+		TwitchServiceSendShoutoutProcedure,
+		svc.SendShoutout,
+		connect.WithSchema(twitchServiceSendShoutoutMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceSendAnnouncementHandler := connect.NewUnaryHandler(
+		TwitchServiceSendAnnouncementProcedure,
+		svc.SendAnnouncement,
+		connect.WithSchema(twitchServiceSendAnnouncementMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	twitchServiceGetChattersHandler := connect.NewUnaryHandler(
+		TwitchServiceGetChattersProcedure,
+		svc.GetChatters,
+		connect.WithSchema(twitchServiceGetChattersMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/twitch.v1.TwitchService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case TwitchServiceGetCurrentUserInfoProcedure:
-			twitchServiceGetCurrentUserInfoHandler.ServeHTTP(w, r)
+		case TwitchServiceSubscribeToEventsProcedure:
+			twitchServiceSubscribeToEventsHandler.ServeHTTP(w, r)
+		case TwitchServiceSendChatMessageProcedure:
+			twitchServiceSendChatMessageHandler.ServeHTTP(w, r)
+		case TwitchServiceGetUsersProcedure:
+			twitchServiceGetUsersHandler.ServeHTTP(w, r)
+		case TwitchServiceCreateCustomRewardProcedure:
+			twitchServiceCreateCustomRewardHandler.ServeHTTP(w, r)
+		case TwitchServiceGetCustomRewardsProcedure:
+			twitchServiceGetCustomRewardsHandler.ServeHTTP(w, r)
+		case TwitchServiceUpdateCustomRewardProcedure:
+			twitchServiceUpdateCustomRewardHandler.ServeHTTP(w, r)
+		case TwitchServiceDeleteCustomRewardProcedure:
+			twitchServiceDeleteCustomRewardHandler.ServeHTTP(w, r)
+		case TwitchServiceGetChannelInformationProcedure:
+			twitchServiceGetChannelInformationHandler.ServeHTTP(w, r)
+		case TwitchServiceUpdateRedemptionStatusProcedure:
+			twitchServiceUpdateRedemptionStatusHandler.ServeHTTP(w, r)
+		case TwitchServiceSendShoutoutProcedure:
+			twitchServiceSendShoutoutHandler.ServeHTTP(w, r)
+		case TwitchServiceSendAnnouncementProcedure:
+			twitchServiceSendAnnouncementHandler.ServeHTTP(w, r)
+		case TwitchServiceGetChattersProcedure:
+			twitchServiceGetChattersHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -108,6 +393,50 @@ func NewTwitchServiceHandler(svc TwitchServiceHandler, opts ...connect.HandlerOp
 // UnimplementedTwitchServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTwitchServiceHandler struct{}
 
-func (UnimplementedTwitchServiceHandler) GetCurrentUserInfo(context.Context, *connect.Request[v1.GetCurrentUserInfoRequest]) (*connect.Response[v1.GetCurrentUserInfoResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.GetCurrentUserInfo is not implemented"))
+func (UnimplementedTwitchServiceHandler) SubscribeToEvents(context.Context, *connect.Request[v1.SubscribeToEventsRequest], *connect.ServerStream[v1.SubscribeToEventsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.SubscribeToEvents is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) SendChatMessage(context.Context, *connect.Request[v1.SendChatMessageRequest]) (*connect.Response[v1.SendChatMessageResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.SendChatMessage is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.GetUsers is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) CreateCustomReward(context.Context, *connect.Request[v1.CreateCustomRewardRequest]) (*connect.Response[v1.CreateCustomRewardResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.CreateCustomReward is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) GetCustomRewards(context.Context, *connect.Request[v1.GetCustomRewardsRequest]) (*connect.Response[v1.GetCustomRewardsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.GetCustomRewards is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) UpdateCustomReward(context.Context, *connect.Request[v1.UpdateCustomRewardRequest]) (*connect.Response[v1.UpdateCustomRewardResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.UpdateCustomReward is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) DeleteCustomReward(context.Context, *connect.Request[v1.DeleteCustomRewardRequest]) (*connect.Response[v1.DeleteCustomRewardResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.DeleteCustomReward is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) GetChannelInformation(context.Context, *connect.Request[v1.GetChannelInformationRequest]) (*connect.Response[v1.GetChannelInformationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.GetChannelInformation is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) UpdateRedemptionStatus(context.Context, *connect.Request[v1.UpdateRedemptionStatusRequest]) (*connect.Response[v1.UpdateRedemptionStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.UpdateRedemptionStatus is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) SendShoutout(context.Context, *connect.Request[v1.SendShoutoutRequest]) (*connect.Response[v1.SendShoutoutResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.SendShoutout is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) SendAnnouncement(context.Context, *connect.Request[v1.SendAnnouncementRequest]) (*connect.Response[v1.SendAnnouncementResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.SendAnnouncement is not implemented"))
+}
+
+func (UnimplementedTwitchServiceHandler) GetChatters(context.Context, *connect.Request[v1.GetChattersRequest]) (*connect.Response[v1.GetChattersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("twitch.v1.TwitchService.GetChatters is not implemented"))
 }
