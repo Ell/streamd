@@ -1,0 +1,21 @@
+version: "3"
+
+tasks:
+  clean:
+    cmds:
+      - go mod tidy
+  streamd:build:
+    cmds:
+      - go build -o streamd.exe ./cmd/streamd
+  twitch:eventsub:start:
+    cmds:
+      - twitch event websocket start-server --port 8080
+  twitch:eventsub:subscribe:
+    cmds:
+      - twitch event trigger -v 1 --transport=websocket channel.subscribe
+  twitch:eventsub:follow:
+    cmds:
+      - twitch event trigger -v 2 --transport=websocket channel.follow
+  twitch:helix:start:
+    cmds:
+      - twitch mock-api start --port 9090
