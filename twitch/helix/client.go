@@ -81,7 +81,7 @@ func makeHelixGetRequest[T, U interface{}](client *Client, url string, data T) (
 	return respData, nil
 }
 
-func makeHelixPostRequest[T, U interface{}](client *Client, url string, data T) (APIResponse[U], error) {
+func makeHelixPostRequest[T, U any](client *Client, url string, data T) (APIResponse[U], error) {
 	var respData APIResponse[U]
 
 	c := http.Client{Timeout: 5 * time.Second}
@@ -141,6 +141,10 @@ func makeHelixPostRequest[T, U interface{}](client *Client, url string, data T) 
 		return respData, err
 	}
 
+	if len(respBody) <= 0 {
+		return respData, nil
+	}
+
 	err = json.Unmarshal(respBody, &respData)
 	if err != nil {
 		log.Printf("Unable to unmarshal helix data %s", err)
@@ -188,6 +192,10 @@ func makeHelixDeleteRequest[T, U interface{}](client *Client, url string, data T
 	if err != nil {
 		log.Printf("Could not read helix response body %s", err)
 		return respData, err
+	}
+
+	if len(respBody) <= 0 {
+		return respData, nil
 	}
 
 	err = json.Unmarshal(respBody, &respData)
