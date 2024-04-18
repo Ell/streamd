@@ -20,8 +20,10 @@ type EventHandlerClient struct {
 }
 
 func main() {
-	apiKey := flag.String("api_key", "apikey123", "service api key")
-	apiHost := flag.String("api_host", "http://localhost:8065", "streamd host")
+	apiHost := flag.String("apiKey", "http://100.109.188.101:8065", "streamd host")
+	apiKey := flag.String("apiHost", "streamd123", "streamd key")
+
+	flag.Parse()
 
 	if *apiKey == "" {
 		log.Fatalf("api_key not provided")
@@ -63,31 +65,36 @@ func main() {
 			log.Fatal(err)
 		}
 
-		for res.Receive() != false {
-			eventsCh <- res.Msg()
+		for {
+			if res.Receive() {
+				eventsCh <- res.Msg()
+			} else {
+				log.Fatal("Messages closed")
+			}
 		}
 	}()
 
 	for {
-		select {
-		case event := <-eventsCh:
-			{
-				switch event.Message.Payload.Event.Event.(type) {
-				case *twitchv1.Event_ChannelPointsCustomRewardRedemption:
-					{
-						redemptionEvent := event.Message.Payload.Event.Event.(*twitchv1.Event_ChannelPointsCustomRewardRedemption)
-						redemption := redemptionEvent.ChannelPointsCustomRewardRedemption
+		event := <-eventsCh
 
-						err := handlerClient.HandleChannelPointsRedemption(redemption)
-						if err != nil {
-							log.Fatal(err)
-						}
-					}
+		if event.Message == nil {
+			continue
+		}
+
+		switch event.Message.Payload.Event.Event.(type) {
+		case *twitchv1.Event_ChannelPointsCustomRewardRedemption:
+			{
+				redemptionEvent := event.Message.Payload.Event.Event.(*twitchv1.Event_ChannelPointsCustomRewardRedemption)
+				redemption := redemptionEvent.ChannelPointsCustomRewardRedemption
+
+				err := handlerClient.HandleChannelPointsRedemption(redemption)
+				if err != nil {
+					log.Fatal(err)
 				}
 			}
-		case <-eventsCtx.Done():
+		default:
 			{
-				log.Fatal("Events context completed")
+				continue
 			}
 		}
 	}
@@ -118,7 +125,21 @@ func (e *EventHandlerClient) HandleChannelPointsRedemption(redemption *twitchv1.
 func (e *EventHandlerClient) HandleFartRedemption(fartType string) error {
 	log.Printf("Got fart %+v\n", fartType)
 
-	fartPath := filepath.Join(AssetsPath, "fart.wav")
+	var fartPath = ""
+
+	if fartType == "Fart" {
+		fartPath = filepath.Join(AssetsPath, "fart.wav")
+	}
+
+	if fartType == "Fart 2" {
+		fartPath = filepath.Join(AssetsPath, "fart2.wav")
+	}
+
+	log.Printf("fart path %+v", fartPath)
+
+	if fartPath == "" {
+		return nil
+	}
 
 	err := e.audioPlayer.Play(fartPath)
 

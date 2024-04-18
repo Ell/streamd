@@ -290,7 +290,7 @@ func (c *Client) SendChatAnnouncement(params *SendAnnouncementParams, req *SendA
 }
 
 func (c *Client) SendChatShoutout(req *SendShoutoutRequest) error {
-	apiUrl := c.baseUrl + "/chat/shoutouts"
+	apiUrl := c.baseUrl + "/chat/shoutouts?" + "from_broadcaster_id=" + req.FromBroadcasterId + "&moderator_id=" + req.ModeratorId + "&to_broadcaster_id=" + req.ToBroadcasterId
 
 	_, err := makeHelixPostRequest[SendShoutoutRequest, interface{}](c, apiUrl, *req)
 	if err != nil {

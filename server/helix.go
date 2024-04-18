@@ -411,7 +411,10 @@ func (s *Server) SendAnnouncement(
 ) (*connect.Response[twitchv1.SendAnnouncementResponse], error) {
 	helixSendAnnouncementRequest := &helix.SendAnnouncementRequest{
 		Message: req.Msg.Message,
-		Color:   *req.Msg.Color,
+	}
+
+	if req.Msg.Color != nil {
+		helixSendAnnouncementRequest.Color = *req.Msg.Color
 	}
 
 	params := &helix.SendAnnouncementParams{
