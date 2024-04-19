@@ -78,8 +78,8 @@ func (s *Server) Listen(addr string) error {
 			&http2.Server{},
 		),
 		ReadHeaderTimeout: time.Second,
-		ReadTimeout:       5 * time.Minute,
-		WriteTimeout:      5 * time.Minute,
+		ReadTimeout:       0,
+		WriteTimeout:      0,
 		MaxHeaderBytes:    8 * 1024,
 	}
 
