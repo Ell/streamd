@@ -1,0 +1,229 @@
+syntax = "proto3";
+
+package twitch.v1;
+
+option go_package = "github.com/ell/streamd/rpc/twitch/v1;twitchv1";
+
+message EventUser {
+  string id = 1;
+  string login = 2;
+  string username = 3;
+}
+
+message EventCheermote {
+  string prefix = 1;
+  uint64 bits = 2;
+}
+
+message EventCheer {
+  uint64 bits = 1;
+}
+
+message EventEmote {
+  string id = 1;
+  string emote_set_id = 2;
+  string owner_id = 3;
+  string format = 4;
+}
+
+message EventBadge {
+  string set_id = 1;
+  string id = 2;
+  string info = 3;
+}
+
+message EventMessageFragment {
+  string type = 1;
+  string text = 2;
+  EventCheermote cheermote = 3;
+  EventEmote emote = 4;
+  EventUser mention = 5;
+}
+
+message EventReply {
+  string parent_message_id = 1;
+  string parent_message_body = 2;
+  EventUser parent_user = 3;
+  string thread_message_id = 4;
+  string thread_message_body = 5;
+  EventUser thread_user = 6;
+}
+
+message ChannelChatMessageEventMessage {
+  string text = 1;
+  repeated EventMessageFragment fragments = 2;
+}
+
+message ChannelChatMessageCondition {
+  string broadcaster_user_id = 1;
+  string user_id = 2;
+}
+
+message ChannelChatMessageEvent {
+  EventUser broadcaster = 1;
+  EventUser chatter = 2;
+  string message_id = 3;
+  string color = 4;
+  repeated EventBadge badges = 5;
+  string message_type = 6;
+  EventCheer cheer = 7;
+  string channel_points_custom_reward_id = 8;
+  EventReply reply = 9;
+}
+
+message ChannelFollowCondition {
+  string broadcaster_user_id = 1;
+  string moderator_user_id = 2;
+}
+
+message ChannelFollowEvent {
+  EventUser user = 1;
+  EventUser broadcaster = 2;
+  string followed_at = 3;
+}
+
+message ChannelAdBreakCondition {
+  string broadcaster_user_id = 1;
+}
+
+message ChannelAdBreakEvent {
+  string duration_seconds = 1;
+  string started_at = 2;
+  string is_automatic = 3;
+  EventUser broadcaster = 4;
+  EventUser requester = 5;
+}
+
+message ChannelSubscribeCondition {
+  string broadcaster_user_id = 1;
+}
+
+message ChannelSubscribeEvent {
+  EventUser user = 1;
+  EventUser broadcaster = 2;
+  string tier = 3;
+  string is_gift = 4;
+}
+
+message ChannelSubscriptionGiftCondition {
+  string broadcaster_user_id = 1;
+}
+
+message ChannelSubscriptionGiftEvent {
+  EventUser user = 1;
+  EventUser broadcaster = 2;
+  uint64 total = 3;
+  string tier = 4;
+  uint64 cumulative_total = 5;
+  bool is_anonymous = 6;
+}
+
+message ChannelCheerCondition {
+  string broadcaster_user_id = 1;
+}
+
+message ChannelCheerEvent {
+  bool is_anonymous = 1;
+  EventUser user = 2;
+  EventUser broadcaster = 3;
+  string message = 4;
+  uint64 bits = 5;
+}
+
+message ChannelRaidCondition {
+  string to_broadcaster_user_id = 1;
+}
+
+message ChannelRaidEvent {
+  EventUser from_broadcaster = 1;
+  EventUser to_broadcaster = 2;
+  uint64 viewers = 3;
+}
+
+message ChannelPointsCustomRewardRedemptionCondition {
+  string broadcaster_user_id = 1;
+  string reward_id = 2;
+}
+
+message EventChannelPointsCustomReward {
+  string id = 1;
+  string title = 2;
+  uint64 cost = 3;
+  string prompt = 4;
+}
+
+
+message ChannelPointsCustomRewardRedemptionEvent {
+  string id = 1;
+  EventUser broadcaster = 2;
+  EventUser user = 3;
+  string status = 4;
+  EventChannelPointsCustomReward reward = 5;
+  string redeemed_at = 6;
+}
+
+message EventCondition {
+  oneof condition {
+    ChannelChatMessageCondition channel_chat_message = 1;
+    ChannelFollowCondition channel_follow = 2;
+    ChannelAdBreakCondition channel_ad_break = 3;
+    ChannelSubscribeCondition channel_subscribe = 4;
+    ChannelSubscriptionGiftCondition channel_subscription_gift = 5;
+    ChannelCheerCondition channel_cheer = 6;
+    ChannelRaidCondition channel_raid = 7;
+    ChannelPointsCustomRewardRedemptionCondition channel_points_custom_reward_redemption = 8;
+  }
+}
+
+message Event {
+  oneof event {
+    ChannelChatMessageEvent channel_chat_message = 1;
+    ChannelFollowEvent channel_follow = 2;
+    ChannelAdBreakEvent channel_ad_break = 3;
+    ChannelSubscribeEvent channel_subscribe = 4;
+    ChannelSubscriptionGiftEvent channel_subscription_gift = 5;
+    ChannelCheerEvent channel_cheer = 6;
+    ChannelRaidEvent channel_raid = 7;
+    ChannelPointsCustomRewardRedemptionEvent channel_points_custom_reward_redemption = 8;
+  }
+}
+
+message EventMetadata {
+  string message_id = 1;
+  string message_type = 2;
+  string message_time_stamp = 3;
+  string subscription_type = 4;
+  string subscription_version = 5;
+}
+
+message EventTransport {
+  string method = 1;
+  string session_id = 2;
+}
+
+message EventSubscription {
+  string id = 1;
+  string status = 2;
+  string type = 3;
+  string version = 4;
+  uint64 cost = 5;
+  EventCondition condition = 6;
+  EventTransport transport = 7;
+  string created_at = 8;
+}
+
+message EventPayload {
+  EventSubscription subscriptions = 1;
+  Event event = 2;
+}
+
+message EventMessage {
+  EventMetadata metadata = 1;
+  EventPayload payload = 2;
+}
+
+message SubscribeToEventsRequest {}
+
+message SubscribeToEventsResponse {
+  EventMessage message = 1;
+}

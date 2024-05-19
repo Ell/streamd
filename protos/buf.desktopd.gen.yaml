@@ -1,0 +1,22 @@
+version: v1
+plugins:
+  - plugin: buf.build/community/neoeinstein-prost:v0.3.1
+    out: ../../desktopd/streamd/src/gen
+    opt:
+      - bytes=.
+      - compile_well_known_types
+      - extern_path=.google.protobuf=::pbjson_types
+      - file_descriptor_set
+  - plugin: buf.build/community/neoeinstein-prost-serde:v0.3.0
+    out: ../../desktopd/streamd/src/gen
+  - plugin: buf.build/community/neoeinstein-tonic:v0.4.0
+    out: ../../desktopd/streamd/src/gen
+    opt:
+      - compile_well_known_types
+      - extern_path=.google.protobuf=::pbjson_types
+  - plugin: prost-crate
+    out: ../../desktopd/streamd
+    strategy: all
+    opt:
+      - gen_crate=../../desktopd/streamd/Cargo.toml
+      - include_file=src/gen/mod.rs

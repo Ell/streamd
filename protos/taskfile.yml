@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  streamd:gen:
+    cmds:
+      - buf generate --template buf.streamd.gen.yaml --path twitch
+  alerts:gen:
+    cmds:
+      - buf generate --template buf.alerts.gen.yaml --path twitch
+  desktopd:gen:
+    cmds:
+      - buf generate --template buf.desktopd.gen.yaml --path twitch
+  gen:all:
+    cmds:
+      - task streamd:gen
+      - task alerts:gen
+      - task desktopd:gen

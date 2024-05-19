@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package twitch.v1;
+
+option go_package = "github.com/ell/streamd/rpc/twitch/v1;twitchv1";
+
+message SendChatMessageRequest {
+  string broadcaster_id = 1;
+  string sender_id = 2;
+  string message = 3;
+  string reply_parent_message_id = 4;
+}
+
+message SendChatMessageResponse {
+  string message_id = 1;
+  bool is_sent = 2;
+  message DropReason {
+    string code = 1;
+    string message = 2;
+  };
+}
+
+message GetUsersRequest {
+  oneof user {
+    string id = 1;
+    string login = 2;
+  }
+}
+
+message GetUsersResponse {
+  string id = 1;
+  string login = 2;
+  string display_name = 3;
+  string user_type = 4;
+  string broadcaster_type = 5;
+  string description = 6;
+  string profile_image_url = 7;
+  string offline_image_url = 8;
+  uint64 view_count = 9;
+  string email = 10;
+  string created_at = 11;
+}
+
+message GetChannelInformationRequest {
+  string broadcaster_id = 1;
+}
+
+message GetChannelInformationResponse {
+  string broadcaster_id = 1;
+  string broadcaster_login = 2;
+  string broadcaster_name = 3;
+  string broadcaster_language = 4;
+  string game_id = 5;
+  string game_name = 6;
+  string title = 7;
+  uint32 delay = 8;
+  repeated string tags = 9;
+  repeated string content_classification_labels = 10;
+  bool is_branded_content = 11;
+}
+
+message CreateCustomRewardRequest {
+  string title = 1;
+  uint64 cost = 2;
+}
+
+message MaxPerStreamSetting {
+  bool is_enabled = 1;
+  uint32 max_per_stream = 2;
+}
+
+message MaxPerUserPerStreamSetting {
+  bool is_enabled = 1;
+  uint32 max_per_user_per_stream = 2;
+}
+
+message GlobalCooldownSetting {
+  bool is_enabled = 1;
+  uint32 global_cooldown_seconds = 2;
+}
+
+message DefaultImage {
+  string url_1x = 1;
+  string url_2x = 2;
+  string url_4x = 3;
+}
+
+message CustomRewardResponse {
+  string broadcaster_name = 1;
+  string broadcaster_login = 2;
+  string broadcaster_id = 3;
+  string id = 4;
+  string image = 5;
+  string background_color = 6;
+  bool is_enabled = 7;
+  uint32 cost = 8;
+  string title = 9;
+  string prompt = 10;
+  bool is_user_input_required = 11;
+  MaxPerStreamSetting max_per_stream_setting = 12;
+  MaxPerUserPerStreamSetting max_per_user_per_stream_setting = 13;
+  GlobalCooldownSetting global_cooldown_setting = 14;
+  bool is_paused = 15;
+  bool is_in_stock = 16;
+  DefaultImage default_image = 17;
+  bool should_redemptions_skip_request_queue = 18;
+  string redemptions_redeemed_current_stream = 19;
+  string cooldown_expires_at = 20;
+}
+message CreateCustomRewardResponse {
+  CustomRewardResponse reward = 1;
+
+}
+
+message GetCustomRewardsRequest {
+  string broadcaster_id = 1;
+}
+
+message GetCustomRewardsResponse {
+  repeated CustomRewardResponse rewards = 1;
+}
+
+message UpdateCustomRewardRequest {
+  optional string title = 1;
+  optional string prompt = 2;
+  optional uint64 cost = 3;
+  optional string background_color = 4;
+  optional bool is_enabled = 5;
+  optional bool is_user_input_required = 6;
+  optional bool is_max_per_stream_enabled = 7;
+  optional uint64 max_per_stream = 8;
+  optional bool is_max_per_user_per_stream_enabled = 9;
+  optional uint64 max_per_user_per_stream = 10;
+  optional bool is_global_cooldown_enabled = 11;
+  optional uint64 global_cooldown_seconds = 12;
+  optional bool is_paused = 13;
+  optional bool should_redemptions_skip_request_queue = 14;
+  string broadcaster_id = 15;
+  string id = 16;
+}
+
+message UpdateCustomRewardResponse {
+  CustomRewardResponse reward = 1;
+}
+
+message DeleteCustomRewardRequest {
+  string broadcaster_user_id = 1;
+  string id = 2;
+}
+
+message DeleteCustomRewardResponse {}
+
+message UpdateRedemptionStatusRequest {
+  string id = 1;
+  string broadcaster_id = 2;
+  string reward_id = 3;
+  string status = 4;
+}
+
+message UpdateRedemptionStatusResponse {}
+
+message SendShoutoutRequest {
+  string from_broadcaster_id = 1;
+  string to_broadcaster_id = 2;
+  string moderator_id = 3;
+}
+
+message SendShoutoutResponse {}
+
+message SendAnnouncementRequest {
+  string broadcaster_id = 1;
+  string moderator_id = 2;
+  string message = 3;
+  optional string color = 4;
+}
+
+message SendAnnouncementResponse {}
+
+message GetChattersRequest {
+  string broadcaster_id = 1;
+  string moderator_id = 2;
+}
+
+message Chatter {
+  string user_id = 1;
+  string user_login = 2;
+  string username = 3;
+}
+
+message GetChattersResponse {
+  repeated Chatter chatters = 1;
+}

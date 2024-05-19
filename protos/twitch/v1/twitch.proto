@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package twitch.v1;
+
+option go_package = "github.com/ell/streamd/rpc/twitch/v1;twitchv1";
+
+import "twitch/v1/helix.proto";
+import "twitch/v1/eventsub.proto";
+
+service TwitchService {
+  rpc SubscribeToEvents(SubscribeToEventsRequest) returns (stream SubscribeToEventsResponse) {}
+  rpc SendChatMessage(SendChatMessageRequest) returns (SendChatMessageResponse) {}
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {}
+  rpc CreateCustomReward(CreateCustomRewardRequest) returns (CreateCustomRewardResponse) {}
+  rpc GetCustomRewards(GetCustomRewardsRequest) returns (GetCustomRewardsResponse) {}
+  rpc UpdateCustomReward(UpdateCustomRewardRequest) returns (UpdateCustomRewardResponse) {}
+  rpc DeleteCustomReward(DeleteCustomRewardRequest) returns (DeleteCustomRewardResponse) {}
+  rpc GetChannelInformation(GetChannelInformationRequest) returns (GetChannelInformationResponse) {}
+  rpc UpdateRedemptionStatus(UpdateRedemptionStatusRequest) returns (UpdateRedemptionStatusResponse) {}
+  rpc SendShoutout(SendShoutoutRequest) returns (SendShoutoutResponse) {}
+  rpc SendAnnouncement(SendAnnouncementRequest) returns (SendAnnouncementResponse) {}
+  rpc GetChatters(GetChattersRequest) returns (GetChattersResponse) {}
+}
