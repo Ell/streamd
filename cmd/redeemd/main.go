@@ -20,7 +20,7 @@ type EventHandlerClient struct {
 }
 
 func main() {
-	apiHost := flag.String("apiKey", "http://100.109.188.101:8065", "streamd host")
+	apiHost := flag.String("apiKey", "http://localhost:8065", "streamd host")
 	apiKey := flag.String("apiHost", "streamd123", "streamd key")
 
 	flag.Parse()
